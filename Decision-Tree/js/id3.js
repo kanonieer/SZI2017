@@ -5,6 +5,7 @@
 
 var id3 = ( _s, target, features) => {
     var targets = _.unique(_s.pluck(target));
+    console.log(targets);
     if (targets.length == 1) {
         console.log("end node! " + targets[0]);
         return {type:"result", val: targets[0], name: targets[0], alias: targets[0] + randomTag() }; 
@@ -48,7 +49,7 @@ var predict = ( id3Model, sample) => {
 
 
 
-//necessary math functions
+//math
 
 var entropy = (vals) => {
     var uniqueVals = _.unique(vals);

@@ -5,5 +5,7 @@ $(document).ready(function(){
             drawGraph(testModel,'canvas');
             renderSamples(saper_samples,$("#samples"),testModel,'isBomb',saper_features);
             renderTrainingData(saper_examples,$("#training"),'isBomb',saper_features);
+            $("#percentage").append(calcError( saper_samples, testModel, 'isBomb' ))
+            //console.log(calcError( saper_samples, testModel, 'isBomb' ));
       });
 });
