@@ -1,0 +1,28 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: grey;
+}
+
+.wrapper {
+    margin: 8px auto 6px;
+    width: 420px;
+    position: relative;
+}
+
+.board_wrapper {
+    height: 420px;
+	width: 420px;
+    background-color: white;
+    border: 2px solid black;
+}
+
+.row_wrapper div {
+    border: 2px solid black;
+    float: left;
+}
+
+.reset {
+    top: 0px;
+    padding: 6px 39px 6px 40px;
+}
