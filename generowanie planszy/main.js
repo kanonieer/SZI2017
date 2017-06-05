@@ -1,4 +1,17 @@
 $(document).ready(function() {
+  $("#decision-tree").click(function(e){
+        e.preventDefault();
+        var testModel = id3(saper_examples,'isBomb',saper_features);
+        //drawGraph(testModel,'canvas');
+        //renderSamples(saper_samples,$("#samples"),testModel,'isBomb',saper_features);
+        //renderTrainingData(saper_examples,$("#training"),'isBomb',saper_features);
+        $("#percentage").append(calcError( saper_samples, testModel, 'isBomb' ))
+        //console.log(calcError( saper_samples, testModel, 'isBomb' ));
+  });  
+
+  $("#start").click(() => {
+
+
   // utworzenie planszy
   var gridSize = 10;
   var grid = [];
@@ -9,9 +22,21 @@ $(document).ready(function() {
       grid[i][j] = 'Empty';
     }
   }
+  var originalAttributes = $("#tmp").attr('style');
 
+  var resetSaper = function() {
+   // Reset from original
+    $("#tmp").attr('style',originalAttributes);
+    $("#tmp").empty();
+
+  };
+
+  resetSaper();
+  
   var boardSize = (420 / gridSize) - 4;
   var box = document.querySelector('#row_wrapper');
+  //czyści poprzednią plansze
+  box.innerHTML = '';
 
   for (var boardX = 0; boardX < gridSize; boardX++) {
     for (var boardY = 0; boardY < gridSize; boardY++) {
@@ -84,12 +109,13 @@ $(document).ready(function() {
     return false;
 
   };
-
+  var count = 0;
   // This function will check a location's status
   // (a location is "valid" if it is on the grid, is not an "obstacle",
   // and has not yet been visited by our algorithm)
   // Returns "Valid", "Invalid", "Blocked", or "Goal"
   var locationStatus = function(location, grid) {
+    count += 1;
     var gridSize = grid.length;
     var dft = location.distanceFromTop;
     var dfl = location.distanceFromLeft;
@@ -103,7 +129,7 @@ $(document).ready(function() {
       return 'Invalid';
     } else if (grid[dft][dfl] === 'Goal') {
       return 'Goal';
-    } else if (grid[dft][dfl] !== 'Empty') {
+    } else if (grid[dft][dfl] === 'Obstacle') {
       // location is either an obstacle or has been visited
       return 'Blocked';
     } else {
@@ -140,9 +166,9 @@ $(document).ready(function() {
     newLocation.status = locationStatus(newLocation, grid);
 
     // If this new location is valid, mark it as 'Visited'
-    // if (newLocation.status === 'Valid') {
-    //   grid[newLocation.distanceFromTop][newLocation.distanceFromLeft] = 'Visited';
-    // }
+    if (newLocation.status === 'Valid') {
+      grid[newLocation.distanceFromTop][newLocation.distanceFromLeft] = 'Visited';
+    }
 
     return newLocation;
   };
@@ -165,17 +191,18 @@ $(document).ready(function() {
   }
 
   // generowanie bomb w randomowych miejscach
-  var bombAmount = 5;
+  var bombAmount = 3;
   var bomb = [];
   var generateBomb = function() {
-
+  var bombX;
+  var bombY;
     for (var bombI = 0; bombI < bombAmount; bombI++) {
-      var bombX = getRandomInt(1, gridSize - 1);
-      var bombY = getRandomInt(1, gridSize - 1);
+      bombX = getRandomInt(1, gridSize - 1);
+      bombY = getRandomInt(1, gridSize - 1);
       
       if (grid[bombX][bombY] === "Goal") {
-        var bombX = getRandomInt(1, gridSize - 1);
-        var bombY = getRandomInt(1, gridSize - 1);
+        // var bombX = getRandomInt(1, gridSize - 1);
+        // var bombY = getRandomInt(1, gridSize - 1);
         bombI--;
       } else {
         bomb[bombI] = [bombX, bombY];
@@ -190,18 +217,19 @@ $(document).ready(function() {
   // generowanie przeszkód w randomowych miejscach
   var obstacleAmount = 3;
   var generateObstacle = function() {
-
+  var obstacleX;
+  var obstacleY;
     for (var obstacleI = 0; obstacleI < obstacleAmount; obstacleI++) {
-      var obstacleX = getRandomInt(1, gridSize - 1);
-      var obstacleY = getRandomInt(1, gridSize - 1);
+      obstacleX = getRandomInt(1, gridSize - 1);
+      obstacleY = getRandomInt(1, gridSize - 1);
 
       if (grid[obstacleX][obstacleY] === "Obstacle") {
-        var obstacleX = getRandomInt(1, gridSize - 1);
-        var obstacleY = getRandomInt(1, gridSize - 1);
+        // var obstacleX = getRandomInt(1, gridSize - 1);
+        // var obstacleY = getRandomInt(1, gridSize - 1);
         obstacleI--;
       } else if (grid[obstacleX][obstacleY] === "Goal") {
-        var obstacleX = getRandomInt(1, gridSize - 1);
-        var obstacleY = getRandomInt(1, gridSize - 1);
+        // var obstacleX = getRandomInt(1, gridSize - 1);
+        // var obstacleY = getRandomInt(1, gridSize - 1);
         obstacleI--;
       } else {
         grid[obstacleX][obstacleY] = "Obstacle";
@@ -235,7 +263,56 @@ $(document).ready(function() {
       }
     }
   };
+    // mechanika poruszania się saperem
+  var moving3 = function(direction) {
+    var tmp = boardSize + 4;
+    var turn = "-=" + tmp + "px";
+    console.log("Moving "+direction);
+    var speed = 50;
+      if (direction == "Down") {
+        $(saper).delay(speed).animate({
+          bottom: turn
+        }, 100);
+      } else if (direction == "Up") {
+        $(saper).delay(speed).animate({
+          top: turn
+        }, 100);
+      } else if (direction == "Right") {
+        $(saper).delay(speed).animate({
+          right: turn
+        }, 100);
+      } else if (direction == "Left") {
+        $(saper).delay(speed).animate({
+          left: turn
+        }, 100);
+      }
+  };
+    var moving4=function(direction){
+    var x=actualX;
+    var y=actualY;
+    if(direction=="Up"){
+      x=x-1;
+      document.getElementById(x+":"+y).style.backgroundColor="orange";
+      console.log(x+":"+y);
+    }
+    else if(direction=="Down"){
+      x=x+1;
+      document.getElementById(x+":"+y).style.backgroundColor="orange";
+      console.log(x+":"+y);
+    }
+    else if(direction=="Left"){
+      y=y-1;
+      document.getElementById(x+":"+y).style.backgroundColor="orange";
+      console.log(x+":"+y);
+    }
+    else if(direction=="Right"){
+      y=y+1;
+      document.getElementById(x+":"+y).style.backgroundColor="orange";
+      console.log(x+":"+y);
+    }
   
+  };
+
   var moving2=function(){
     var x=actualX;
     var y=actualY;
@@ -274,7 +351,7 @@ $(document).ready(function() {
 
   for (var index = 0; index < bombAmount; index++) {
     var bombPath = findShortestPath([actualX,actualY], grid);
-    moving2();
+    //moving2();
     for(i = 0; i<bombPath.length; i++){
       if(bombPath[i]=="Down"){
         actualX=actualX+1;
@@ -288,14 +365,19 @@ $(document).ready(function() {
       else if(bombPath[i]=="Left"){
         actualY=actualY-1;
       }
+      moving3(bombPath[i]);
     }
     // console.log(locationStatus(location, grid));
     //startPos = bomb[index];
     console.log(bombPath);
     //moving();
     //console.log(grid[bomb[index][0]][bomb[index][1]] );
-    grid[actualX][actualY]='Empty';
+    grid[actualX][actualY]='Valid';
     //console.log(grid[bomb[index][0]][bomb[index][1]] );
   }
+  console.log(count);
+
   // zastosowanie algorytmu i przypisanie do zmiennej bombPath
+  });
+
 });

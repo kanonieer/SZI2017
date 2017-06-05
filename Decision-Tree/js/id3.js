@@ -46,8 +46,6 @@ var predict = ( id3Model, sample) => {
     return root.val;
 }
 
-
-
 //math
 
 var entropy = (vals) => {
