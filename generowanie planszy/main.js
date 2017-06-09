@@ -1,7 +1,8 @@
 $(document).ready(function() {
+  var testModel;
   $("#decision-tree").click(function(e){
         e.preventDefault();
-        var testModel = id3(saper_examples,'isBomb',saper_features);
+        testModel = id3(saper_examples,'isBomb',saper_features);
         //drawGraph(testModel,'canvas');
         //renderSamples(saper_samples,$("#samples"),testModel,'isBomb',saper_features);
         //renderTrainingData(saper_examples,$("#training"),'isBomb',saper_features);
@@ -76,7 +77,7 @@ $(document).ready(function() {
       var newLocation = exploreInDirection(currentLocation, 'Up', grid);
       if (newLocation.status === 'Goal') {
         return newLocation.path;
-      } else if (newLocation.status === 'Valid') {
+      } else if (newLocation.status === ('Valid'|| 'Empty')) {
         queue.push(newLocation);
       }
 
@@ -84,7 +85,7 @@ $(document).ready(function() {
       var newLocation = exploreInDirection(currentLocation, 'Right', grid);
       if (newLocation.status === 'Goal') {
         return newLocation.path;
-      } else if (newLocation.status === 'Valid') {
+      } else if (newLocation.status === ('Valid'|| 'Empty')) {
         queue.push(newLocation);
       }
 
@@ -92,7 +93,7 @@ $(document).ready(function() {
       var newLocation = exploreInDirection(currentLocation, 'Down', grid);
       if (newLocation.status === 'Goal') {
         return newLocation.path;
-      } else if (newLocation.status === 'Valid') {
+      } else if (newLocation.status === ('Valid'|| 'Empty')) {
         queue.push(newLocation);
       }
 
@@ -100,7 +101,7 @@ $(document).ready(function() {
       var newLocation = exploreInDirection(currentLocation, 'Left', grid);
       if (newLocation.status === 'Goal') {
         return newLocation.path;
-      } else if (newLocation.status === 'Valid') {
+      } else if (newLocation.status === ('Valid'|| 'Empty')) {
         queue.push(newLocation);
       }
     }
@@ -129,7 +130,7 @@ $(document).ready(function() {
       return 'Invalid';
     } else if (grid[dft][dfl] === 'Goal') {
       return 'Goal';
-    } else if (grid[dft][dfl] === 'Obstacle') {
+    } else if (grid[dft][dfl] !== 'Empty') {
       // location is either an obstacle or has been visited
       return 'Blocked';
     } else {
@@ -167,7 +168,7 @@ $(document).ready(function() {
 
     // If this new location is valid, mark it as 'Visited'
     if (newLocation.status === 'Valid') {
-      grid[newLocation.distanceFromTop][newLocation.distanceFromLeft] = 'Visited';
+      grid[newLocation.distanceFromTop][newLocation.distanceFromLeft] = 'Valid';
     }
 
     return newLocation;
@@ -190,9 +191,17 @@ $(document).ready(function() {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
+
+
   // generowanie bomb w randomowych miejscach
   var bombAmount = 3;
   var bomb = [];
+
+  var bombArrayForTree = [];
+  for( var i = 0; i<bombAmount; i++){
+    bombArrayForTree.push({x:-1,y:-1,bombObject:saper_samples[getRandomInt(0,25)]});    
+  }
+  
   var generateBomb = function() {
   var bombX;
   var bombY;
@@ -201,13 +210,14 @@ $(document).ready(function() {
       bombY = getRandomInt(1, gridSize - 1);
       
       if (grid[bombX][bombY] === "Goal") {
-        // var bombX = getRandomInt(1, gridSize - 1);
-        // var bombY = getRandomInt(1, gridSize - 1);
         bombI--;
       } else {
         bomb[bombI] = [bombX, bombY];
         grid[bombX][bombY] = "Goal";
         document.getElementById(bombX + ":" + bombY).style.backgroundColor = "green";
+        //Dodanie pozycji bomb w tablicy bomb dla drzewa
+        bombArrayForTree[bombI].x = bombX;
+        bombArrayForTree[bombI].y = bombY;
         console.log("Goal at X:" + bombX + " Y:" + bombY);
         //console.log(bomb[bombI]);
       }
@@ -224,12 +234,8 @@ $(document).ready(function() {
       obstacleY = getRandomInt(1, gridSize - 1);
 
       if (grid[obstacleX][obstacleY] === "Obstacle") {
-        // var obstacleX = getRandomInt(1, gridSize - 1);
-        // var obstacleY = getRandomInt(1, gridSize - 1);
         obstacleI--;
       } else if (grid[obstacleX][obstacleY] === "Goal") {
-        // var obstacleX = getRandomInt(1, gridSize - 1);
-        // var obstacleY = getRandomInt(1, gridSize - 1);
         obstacleI--;
       } else {
         grid[obstacleX][obstacleY] = "Obstacle";
@@ -286,31 +292,6 @@ $(document).ready(function() {
           left: turn
         }, 100);
       }
-  };
-    var moving4=function(direction){
-    var x=actualX;
-    var y=actualY;
-    if(direction=="Up"){
-      x=x-1;
-      document.getElementById(x+":"+y).style.backgroundColor="orange";
-      console.log(x+":"+y);
-    }
-    else if(direction=="Down"){
-      x=x+1;
-      document.getElementById(x+":"+y).style.backgroundColor="orange";
-      console.log(x+":"+y);
-    }
-    else if(direction=="Left"){
-      y=y-1;
-      document.getElementById(x+":"+y).style.backgroundColor="orange";
-      console.log(x+":"+y);
-    }
-    else if(direction=="Right"){
-      y=y+1;
-      document.getElementById(x+":"+y).style.backgroundColor="orange";
-      console.log(x+":"+y);
-    }
-  
   };
 
   var moving2=function(){
@@ -370,6 +351,8 @@ $(document).ready(function() {
     // console.log(locationStatus(location, grid));
     //startPos = bomb[index];
     console.log(bombPath);
+    console.log(bombArrayForTree[index].bombObject);
+    console.log('Predykcja:'+ predict( testModel, bombArrayForTree[index].bombObject)); 
     //moving();
     //console.log(grid[bomb[index][0]][bomb[index][1]] );
     grid[actualX][actualY]='Valid';
