@@ -435,12 +435,12 @@ $(document).ready(function() {
 
   // utworzenie sapera
   var createSaper = function() {
-    var saper = document.createElement('canvas');
+    var saper = document.createElement("IMG");
     saper.id = "saper";
+    saper.src = "saper.jpg";
     saper.style.width = boardSize + "px";
     saper.style.height = boardSize + "px";
     saper.style.border = "2px solid black";
-    saper.style.backgroundColor = "orange";
     saper.style.position = "absolute";
     document.getElementById("tmp").appendChild(saper);
   };
@@ -458,7 +458,7 @@ $(document).ready(function() {
 
   var bombArrayForTree = [];
   for( var i = 0; i<bombAmount; i++){
-    bombArrayForTree.push({x:-1,y:-1,bombObject:saper_samples[getRandomInt(0,25)]});    
+    bombArrayForTree.push({x:-1,y:-1,bombObject:bombs_examples[getRandomInt(0,25)]});    
   }
   
   var generateBomb = function() {
@@ -503,33 +503,8 @@ $(document).ready(function() {
     }
   };
 
-  // mechanika poruszania się saperem
-  var moving = function() {
-    var tmp = boardSize + 4;
-    var turn = "-=" + tmp + "px";
-
-    for (var i = 0; i < bombPath.length; i++) {
-      if (bombPath[i] == "Down") {
-        $(saper).delay(200).animate({
-          bottom: turn
-        }, 100);
-      } else if (bombPath[i] == "Up") {
-        $(saper).delay(200).animate({
-          top: turn
-        }, 100);
-      } else if (bombPath[i] == "Right") {
-        $(saper).delay(200).animate({
-          right: turn
-        }, 100);
-      } else if (bombPath[i] == "Left") {
-        $(saper).delay(200).animate({
-          left: turn
-        }, 100);
-      }
-    }
-  };
     // mechanika poruszania się saperem
-  var moving3 = function(direction) {
+  var moving = function(direction) {
     var tmp = boardSize + 4;
     var turn = "-=" + tmp + "px";
     //console.log("Moving "+direction);
@@ -553,7 +528,7 @@ $(document).ready(function() {
       }
   };
 
-  var moving2=function(){
+  var moving_test=function(){
     var x=actualX;
     var y=actualY;
     for(tmp=0; tmp<bombPath.length; tmp++){
@@ -604,7 +579,7 @@ $(document).ready(function() {
       else if(bombPath[i]=="Left"){
         actualY=actualY-1;
       }
-      moving3(bombPath[i]);
+      moving(bombPath[i]);
     }
 
     console.log(bombPath);
