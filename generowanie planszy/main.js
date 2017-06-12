@@ -259,13 +259,14 @@ const synaptic = require('synaptic');
 
 $(document).ready(function() {
   var testModel;
-  $("#decision-tree").click(function(e){
-        e.preventDefault();
-        testModel = id3(saper_examples,'isBomb',saper_features);
+          testModel = id3(saper_examples,'isBomb',saper_features);
         //drawGraph(testModel,'canvas');
         //renderSamples(saper_samples,$("#samples"),testModel,'isBomb',saper_features);
         //renderTrainingData(saper_examples,$("#training"),'isBomb',saper_features);
-        $("#percentage").append(calcError( saper_samples, testModel, 'isBomb' ))
+        $("#percentage").append(calcError( saper_samples, testModel, 'isBomb' ));
+  $("#decision-tree").click(function(e){
+        e.preventDefault();
+
         //console.log(calcError( saper_samples, testModel, 'isBomb' ));
   });  
 
